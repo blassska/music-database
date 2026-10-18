@@ -5,7 +5,7 @@
 
 ---
 
-<img width="1582" height="2037" alt="client_server" src="https://github.com/user-attachments/assets/db6cb52c-0b08-4213-b9d4-f1cac0bffa46" />
+<img width="1583" height="2037" alt="client_server" src="https://github.com/user-attachments/assets/1e829498-adea-43c6-a883-231eae26ac5b" />
 
 ---
 
