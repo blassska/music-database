@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>База данных меломана</title>
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --surface-0: #0D0A0F;
+      --surface-1: #1A1520;
+      --surface-2: #251D2C;
+      --surface-3: #342A3E;
+      --surface-4: #453852;
+      --accent: #FF6B9D;
+      --accent-secondary: #FFA07A;
+      --text: #F5E6D3;
+      --text-dim: #B8A899;
+      --space-xs: clamp(0.5rem, 1vw, 0.75rem);
+      --space-sm: clamp(0.75rem, 1.5vw, 1rem);
+      --space-md: clamp(1rem, 2vw, 1.5rem);
+      --space-lg: clamp(1.5rem, 3vw, 2rem);
+      --space-xl: clamp(2rem, 4vw, 3rem);
+      --radius-full: 999px;
+      --text-sm: clamp(0.875rem, 1vw, 0.9375rem);
+      --text-base: clamp(1rem, 1.2vw, 1.125rem);
+      --text-lg: clamp(1.25rem, 1.5vw, 1.5rem);
+      --text-xl: clamp(1.75rem, 2.5vw, 2.25rem);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--surface-0);
+      color: var(--text);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(255, 107, 157, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(255, 160, 122, 0.05) 0%, transparent 50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .background-decor {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    
+    .cd-disc {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, var(--surface-3) 0%, var(--surface-3) 20%, transparent 21%, transparent 35%, var(--surface-2) 36%, var(--surface-2) 100%);
+      opacity: 0.15;
+      animation: float 20s ease-in-out infinite;
+      box-shadow: 0 0 40px rgba(255, 107, 157, 0.1);
+    }
+    
+    .cd-disc::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface-1);
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .cd-disc:nth-child(1) { top: 10%; left: 10%; }
+    .cd-disc:nth-child(2) { top: 60%; right: 15%; animation-delay: -5s; width: 150px; height: 150px; }
+    .cd-disc:nth-child(3) { bottom: 10%; left: 20%; animation-delay: -10s; width: 180px; height: 180px; }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+    
+    .music-note {
+      position: absolute;
+      font-size: 40px;
+      opacity: 0.1;
+      animation: noteFloat 15s ease-in-out infinite;
+    }
+    
+    .music-note:nth-child(4) { top: 20%; right: 25%; animation-delay: -2s; }
+    .music-note:nth-child(5) { bottom: 30%; left: 15%; animation-delay: -7s; }
+    .music-note:nth-child(6) { top: 70%; right: 10%; animation-delay: -12s; }
+    
+    @keyframes noteFloat {
+      0%, 100% { transform: translateY(0px) rotate(-5deg); opacity: 0.1; }
+      50% { transform: translateY(-50px) rotate(5deg); opacity: 0.15; }
+    }
+    
+    .particle {
+      position: absolute;
+      bottom: -50px;
+      font-size: 20px;
+      color: var(--accent);
+      animation: particleRise linear forwards;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    @keyframes particleRise {
+      0% { bottom: -50px; opacity: 0; transform: translateX(0) rotate(0deg); }
+      10%, 90% { opacity: 0.4; }
+      100% { bottom: 110vh; opacity: 0; transform: translateX(100px) rotate(360deg); }
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+      position: relative;
+      z-index: 1;
+    }
+    
+    header {
+      margin-bottom: var(--space-xl);
+      text-align: center;
+      animation: fadeInDown 0.8s ease-out;
+    }
+    
+    h1 {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-sm);
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow 3s ease-in-out infinite;
+    }
+    
+    .subtitle { color: var(--text-dim); font-size: var(--text-base); }
+    
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 107, 157, 0.4)); }
+      50% { filter: drop-shadow(0 0 20px rgba(255, 107, 157, 0.6)); }
+    }
+    
+    .tabs {
+      display: flex;
+      gap: var(--space-xs);
+      margin: 0 auto var(--space-lg);
+      background: var(--surface-1);
+      padding: var(--space-xs);
+      border-radius: var(--radius-full);
+      width: fit-content;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1s ease-out 0.2s both;
+    }
+    
+    .tab {
+      padding: var(--space-sm) var(--space-md);
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-family: var(--font-sans);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .tab.active {
+      background: var(--accent);
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 0 20px rgba(255, 107, 157, 0.6);
+    }
+    
+    .tab:hover:not(.active) { color: var(--text); transform: translateY(-2px); }
+    
+    .section { display: none; animation: fadeInUp 0.6s ease-out; }
+    .section.active { display: block; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .card {
+      background: var(--surface-2);
+      padding: var(--space-md);
+      border-radius: 1rem;
+      border: 1px solid var(--surface-3);
+      display: grid;
+      gap: var(--space-sm);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: cardFadeIn 0.5s ease-out both;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 107, 157, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    
+    .card:hover::before { opacity: 1; }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 40px rgba(255, 107, 157, 0.2);
+    }
+    
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.2s; }
+    .card:nth-child(5) { animation-delay: 0.25s; }
+    .card:nth-child(6) { animation-delay: 0.3s; }
+    
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: var(--space-sm);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .card-title { font-size: var(--text-lg); font-weight: 500; color: var(--text); }
+    .card-meta { font-size: var(--text-sm); color: var(--text-dim); }
+    .card-actions { display: flex; gap: var(--space-xs); }
+    
+    .btn {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn:active::before { width: 300px; height: 300px; }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+      font-weight: 500;
+    }
+    
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(255, 107, 157, 0.5); }
+    
+    .btn-secondary {
+      background: var(--surface-3);
+      color: var(--text);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-secondary:hover { background: var(--surface-4); transform: translateY(-2px); }
+    .btn-small { padding: var(--space-xs) var(--space-sm); font-size: var(--text-sm); }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+    }
+    
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(220, 38, 38, 0.5); }
+    
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      padding: 0;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    
+    .btn-icon-danger {
+      background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    }
+    
+    .btn-icon-danger:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.5);
+    }
+    
+    .form {
+      background: var(--surface-2);
+      padding: var(--space-lg);
+      border-radius: 1rem;
+      display: grid;
+      gap: var(--space-md);
+      margin: 0 auto var(--space-lg);
+      max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--surface-3);
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .form-group { display: grid; gap: var(--space-xs); }
+    
+    label { font-size: var(--text-sm); color: var(--text-dim); font-weight: 500; }
+    
+    input, select, textarea {
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-3);
+      border: 1px solid var(--surface-4);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: var(--text-base);
+      transition: all 0.3s ease;
+    }
+    
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23F5E6D3' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-sm) center;
+      padding-right: calc(var(--space-md) + 20px);
+      cursor: pointer;
+    }
+    
+    select option { background: var(--surface-2); color: var(--text); padding: var(--space-sm); }
+    input, textarea { cursor: text; }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1), 0 0 20px rgba(255, 107, 157, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    select:hover { border-color: var(--accent); }
+    
+    .song-list { display: grid; gap: var(--space-xs); margin-top: var(--space-sm); }
+    
+    .song-item {
+      background: var(--surface-3);
+      padding: var(--space-sm);
+      border-radius: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .song-item:hover { background: var(--surface-4); transform: translateX(5px); }
+    .search-box { margin-bottom: var(--space-lg); }
+    .empty { text-align: center; padding: var(--space-xl); color: var(--text-dim); animation: fadeIn 0.6s ease-out; }
+  </style>
+</head>
+<body>
+  <div class="background-decor">
+    <div class="cd-disc"></div>
+    <div class="cd-disc"></div>
+    <div class="cd-disc"></div>
+    <div class="music-note">♪</div>
+    <div class="music-note">♫</div>
+    <div class="music-note">♬</div>
+  </div>
+
+  <div class="container">
+    <header>
+      <h1>База данных меломана</h1>
+      <p class="subtitle">Управление артистами, песнями и альбомами</p>
+    </header>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('artists')">Артисты</button>
+      <button class="tab" onclick="switchTab('songs')">Песни</button>
+      <button class="tab" onclick="switchTab('albums')">Альбомы</button>
+      <button class="tab" onclick="switchTab('search')">Поиск</button>
+    </div>
+    
+    <!-- Артисты -->
+    <div id="artists" class="section active">
+      <div class="form">
+        <h2 style="font-size: var(--text-lg);">Добавить артиста</h2>
+        <div class="form-group">
+          <label for="artist-name">Название</label>
+          <input type="text" id="artist-name" placeholder="Название группы или исполнителя">
+        </div>
+        <div class="form-group">
+          <label for="artist-type">Тип</label>
+          <select id="artist-type">
+            <option value="group">Группа</option>
+            <option value="solo">Сольный исполнитель</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="addArtist()">Добавить</button>
+      </div>
+      
+      <div id="artists-list" class="grid"></div>
+    </div>
+    
+    <!-- Песни -->
+    <div id="songs" class="section">
+      <div class="form">
+        <h2 style="font-size: var(--text-lg);">Добавить песню</h2>
+        <div class="form-group">
+          <label for="song-title">Название</label>
+          <input type="text" id="song-title" placeholder="Название песни">
+        </div>
+        <div class="form-group">
+          <label for="song-artist">Артист</label>
+          <select id="song-artist"></select>
+        </div>
+        <div class="form-group">
+          <label for="song-duration">Длительность (секунды)</label>
+          <input type="number" id="song-duration" placeholder="180">
+        </div>
+        <button class="btn btn-primary" onclick="addSong()">Добавить</button>
+      </div>
+      
+      <div id="songs-list" class="grid"></div>
+    </div>
+    
+    <!-- Альбомы -->
+    <div id="albums" class="section">
+      <div class="form">
+        <h2 style="font-size: var(--text-lg);">Добавить альбом</h2>
+        <div class="form-group">
+          <label for="album-title">Название</label>
+          <input type="text" id="album-title" placeholder="Название альбома">
+        </div>
+        <div class="form-group">
+          <label for="album-artist">Артист</label>
+          <select id="album-artist"></select>
+        </div>
+        <div class="form-group">
+          <label for="album-year">Год выпуска</label>
+          <input type="number" id="album-year" placeholder="2024">
+        </div>
+        <button class="btn btn-primary" onclick="addAlbum()">Добавить</button>
+      </div>
+      
+      <div id="albums-list" class="grid"></div>
+    </div>
+    
+    <!-- Поиск -->
+    <div id="search" class="section">
+      <div class="search-box">
+        <div class="form">
+          <h2 style="font-size: var(--text-lg);">Поиск песен по артисту</h2>
+          <div class="form-group">
+            <label for="search-artist">Выберите артиста</label>
+            <select id="search-artist" onchange="searchSongsByArtist()"></select>
+          </div>
+        </div>
+        
+        <div id="artist-songs-result"></div>
+      </div>
+      
+      <div class="search-box">
+        <div class="form">
+          <h2 style="font-size: var(--text-lg);">Поиск альбомов по песне</h2>
+          <div class="form-group">
+            <label for="search-song">Выберите песню</label>
+            <select id="search-song" onchange="searchAlbumsBySong()"></select>
+          </div>
+        </div>
+        
+        <div id="song-albums-result"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
