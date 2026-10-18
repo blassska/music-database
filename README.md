@@ -3,6 +3,7 @@
 
 <img width="1908" height="1005" alt="image" src="https://github.com/user-attachments/assets/291f04e0-48ef-4073-9077-7d13ded9f5af" />
 
+---
 
 Перед использованием нужно скачать и установить Node.js LTS - https://nodejs.org/en/download
 
