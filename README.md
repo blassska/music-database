@@ -5,6 +5,10 @@
 
 ---
 
+<img width="1582" height="2037" alt="client_server" src="https://github.com/user-attachments/assets/db6cb52c-0b08-4213-b9d4-f1cac0bffa46" />
+
+---
+
 Перед использованием нужно скачать и установить Node.js LTS - https://nodejs.org/en/download
 
 Далее запустить терминал в корневой директории проекта \music-database и выполнить следующие команды:
